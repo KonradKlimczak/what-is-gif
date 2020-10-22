@@ -1,33 +1,40 @@
 <template>
   <div id="app">
-    <div>
-      Select all <span class="bold">GIFs</span> to use
-      <span class="facebook">Facebook</span>
-    </div>
-    <main class="main">
-      <div v-for="image in images" :key="image">
-        <img
-          class="img"
-          v-bind:class="{ selected: selected.some((s) => s === image) }"
-          :src="require(`@/assets/${image}`)"
-          v-on:click="
-            selected = selected.some((s) => s === image)
-              ? selected.filter((s) => s !== image)
-              : [...selected, image]
-          "
-        />
+    <div v-if="passed === null">
+      <div>
+        Select all <span class="bold">GIFs</span> to use
+        <span class="facebook">Facebook</span>
       </div>
-    </main>
-    <a
-      class="submit"
-      v-on:click="
-        passed =
-          selected.length === gifs.length &&
-          selected.every((s) => gifs.some((g) => g === s))
-      "
-    >
-      Submit
-    </a>
+      <main class="main">
+        <div v-for="image in images" :key="image">
+          <img
+            class="img"
+            v-bind:class="{ selected: selected.some((s) => s === image) }"
+            :src="require(`@/assets/${image}`)"
+            v-on:click="
+              selected = selected.some((s) => s === image)
+                ? selected.filter((s) => s !== image)
+                : [...selected, image]
+            "
+          />
+        </div>
+      </main>
+      <a class="submit" v-on:click="submit">
+        Submit
+      </a>
+    </div>
+    <div v-if="passed === true">
+      <h1 class="facebook">Congratulations!</h1>
+      <h3>Looks like you have used the Internet before!</h3>
+      <div>
+        Redirecting to facebook...
+      </div>
+    </div>
+    <div v-if="passed === false">
+      <h1 class="dummy">Ooops! Well...</h1>
+      <h3>Maybe you could find some other work.</h3>
+      <img src="@/assets/farmer.jpg"/>
+    </div>
   </div>
 </template>
 
@@ -38,7 +45,6 @@ const gifs = ["1.gif", "2.gif", "3.gif", "4.gif", "5.gif"];
 const jpgs = ["1.jpg", "2.jpg", "3.jpg", "4.jpg"];
 
 const images = [...gifs, ...jpgs].sort(() => Math.random() * 10 - 5);
-console.log(images);
 
 @Component({
   data: function() {
@@ -48,6 +54,20 @@ console.log(images);
       selected: [],
       passed: null,
     };
+  },
+  methods: {
+    submit: function() {
+      this.$data.passed =
+        this.$data.selected.length === this.$data.gifs.length &&
+        this.$data.selected.every((s: string) =>
+          this.$data.gifs.some((g: string) => g === s)
+        );
+      if (this.$data.passed) {
+        setTimeout(() => {
+          window.location.href = "http://www.facebook.com"
+        },5000)
+      }
+    },
   },
 })
 export default class App extends Vue {}
@@ -92,5 +112,8 @@ export default class App extends Vue {}
 }
 .submit:hover {
   text-decoration: underline;
+}
+.dummy {
+  color: #af0000
 }
 </style>
